@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>inVision U — Candidate Screening</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,sans-serif;background:#0f0f13;color:#e2e2e2;min-height:100vh}
+  nav{background:#1a1a24;padding:14px 28px;display:flex;gap:20px;align-items:center;border-bottom:1px solid #2d2d3a}
+  nav a{color:#7c6ff7;text-decoration:none;font-weight:600;font-size:15px}
+  nav span{font-weight:800;color:#fff;font-size:17px;margin-right:auto}
+  .page{display:none;padding:32px 24px;max-width:960px;margin:0 auto}
+  .page.active{display:block}
+  h2{font-size:22px;margin-bottom:20px;color:#fff}
+  label{display:block;margin-bottom:4px;font-size:13px;color:#aaa}
+  input,textarea,select{width:100%;padding:10px;background:#1e1e2e;border:1px solid #2d2d3a;border-radius:8px;color:#e2e2e2;font-size:14px;margin-bottom:14px}
+  textarea{min-height:100px;resize:vertical}
+  .btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:14px}
+  .btn-primary{background:#7c6ff7;color:#fff}
+  .btn-success{background:#22c55e;color:#fff}
+  .btn-danger{background:#ef4444;color:#fff}
+  .btn-sm{padding:6px 12px;font-size:13px}
+  table{width:100%;border-collapse:collapse;margin-top:16px}
+  th{text-align:left;padding:10px 12px;background:#1e1e2e;color:#aaa;font-size:13px;border-bottom:1px solid #2d2d3a}
+  td{padding:10px 12px;border-bottom:1px solid #1e1e2e;font-size:14px}
+  tr:hover td{background:#1a1a28}
+  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:700}
+  .badge-low{background:#16a34a22;color:#22c55e;border:1px solid #22c55e44}
+  .badge-medium{background:#d9780622;color:#f59e0b;border:1px solid #f59e0b44}
+  .badge-high{background:#dc262622;color:#ef4444;border:1px solid #ef4444aa}
+  .card{background:#1a1a24;border:1px solid #2d2d3a;border-radius:12px;padding:20px;margin-bottom:16px}
+  .dim-row{display:flex;align-items:center;gap:12px;margin:8px 0}
+  .dim-label{width:130px;font-size:13px;color:#aaa}
+  .bar-bg{flex:1;height:8px;background:#2d2d3a;border-radius:4px}
+  .bar-fill{height:8px;background:#7c6ff7;border-radius:4px;transition:width .4s}
+  .score-num{width:36px;text-align:right;font-weight:700;font-size:14px}
+  .chip{display:inline-block;background:#2d2d3a;border-radius:20px;padding:4px 10px;font-size:12px;margin:3px}
+  .chip-green{background:#16a34a22;color:#22c55e}
+  .chip-red{background:#dc262622;color:#ef4444}
+  .notice{background:#7c6ff722;border:1px solid #7c6ff755;border-radius:8px;padding:12px;font-size:13px;margin-top:16px;color:#c4bdff}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:600px){.row2{grid-template-columns:1fr}}
+  #toast{position:fixed;bottom:24px;right:24px;background:#7c6ff7;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;display:none;z-index:99}
+</style>
+</head>
+<body>
+<nav>
+  <span>⬡ inVision U</span>
+  <a href="#apply">Apply</a>
+  <a href="#dashboard">Dashboard</a>
+</nav>
+
+<div class="page" id="page-apply">
+  <h2>📋 Candidate Application</h2>
+  <div class="row2">
+    <div>
+      <label>Full Name</label>
+      <input id="f-name" placeholder="Aisha Bekova"/>
+      <label>Age</label>
+      <input id="f-age" type="number" placeholder="18"/>
+      <label>City</label>
+      <input id="f-city" placeholder="Almaty"/>
+      <label>School / University</label>
+      <input id="f-school" placeholder="NIS Almaty"/>
+    </div>
+    <div>
+      <label>GPA (0–4 or 0–5 scale)</label>
+      <input id="f-gpa" type="number" step="0.01" placeholder="3.8"/>
+      <label>Achievements</label>
+      <textarea id="f-achievements" placeholder="Olympiad wins, projects, volunteer work…"></textarea>
+    </div>
+  </div>
+  <label>Essay (Who are you and why do you want to join inVision U?)</label>
+  <textarea id="f-essay" style="min-height:130px" placeholder="Write in your own words…"></textarea>
+  <label>Motivation & Goals</label>
+  <textarea id="f-motivation" placeholder="What impact do you want to make?"></textarea>
+  <button class="btn btn-primary" onclick="submitApplication()">🚀 Submit Application</button>
+</div>
+
+<div class="page" id="page-dashboard">
+  <h2>📊 Admissions Dashboard</h2>
+  <button class="btn btn-primary btn-sm" onclick="loadDashboard()" style="margin-bottom:14px">↻ Refresh</button>
+  <table>
+    <thead><tr><th>#</th><th>Name</th><th>City</th><th>Score</th><th>AI Flag</th><th>Recommendation</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="dashboard-body"></tbody>
+  </table>
+</div>
+
+<div class="page" id="page-candidate">
+  <button class="btn btn-sm" onclick="location.hash='#dashboard'" style="margin-bottom:16px;background:#2d2d3a;color:#aaa">← Back</button>
+  <div id="candidate-detail"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = "http://localhost:8000";
+
+function toast(msg, ok=true){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.style.background=ok?"#7c6ff7":"#ef4444";
+  t.style.display="block"; setTimeout(()=>t.style.display="none",3000);
+}
+
+function route(){
+  const h=location.hash||"#apply";
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  if(h.startsWith("#candidate/")){
+    document.getElementById("page-candidate").classList.add("active");
+    loadCandidate(h.split("/")[1]);
+  } else if(h==="#dashboard"){
+    document.getElementById("page-dashboard").classList.add("active");
+    loadDashboard();
+  } else {
+    document.getElementById("page-apply").classList.add("active");
+  }
+}
+window.addEventListener("hashchange",route);
+route();
+
+async function submitApplication(){
+  const body={
+    name:document.getElementById("f-name").value,
+    age:parseInt(document.getElementById("f-age").value),
+    city:document.getElementById("f-city").value,
+    school:document.getElementById("f-school").value,
+    gpa:parseFloat(document.getElementById("f-gpa").value),
+    achievements:document.getElementById("f-achievements").value,
+    essay:document.getElementById("f-essay").value,
+    motivation:document.getElementById("f-motivation").value
+  };
+  if(!body.name||!body.age||!body.city||!body.school||!body.gpa||!body.essay){
+    toast("Please fill all required fields",false); return;
+  }
+  const r=await fetch(`${API}/candidates`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(r.ok){ toast("Application submitted! ✓"); location.hash="#dashboard"; }
+  else toast("Error submitting",false);
+}
+
+async function loadDashboard(){
+  const r=await fetch(`${API}/candidates`);
+  const rows=await r.json();
+  const sorted=[...rows].sort((a,b)=>(b.total_score||0)-(a.total_score||0));
+  const tbody=document.getElementById("dashboard-body");
+  tbody.innerHTML=sorted.map(c=>`
+    <tr>
+      <td>${c.id}</td>
+      <td><a href="#candidate/${c.id}" style="color:#7c6ff7;text-decoration:none">${c.name}</a></td>
+      <td>${c.city}</td>
+      <td><b>${c.total_score!=null?c.total_score:"—"}</b></td>
+      <td>${c.ai_text_flag?aiBadge(c.ai_text_flag):"—"}</td>
+      <td style="font-size:13px">${c.recommendation||"—"}</td>
+      <td style="font-size:12px;color:#aaa">${c.status||"pending"}</td>
+      <td>
+        <button class="btn btn-primary btn-sm" onclick="runScore(${c.id})">⚡ Score</button>
+      </td>
+    </tr>`).join("");
+}
+
+function aiBadge(flag){
+  const cls={Low:"low",Medium:"medium",High:"high"}[flag]||"medium";
+  return `<span class="badge badge-${cls}">${flag}</span>`;
+}
+
+async function runScore(id){
+  toast("Running AI scoring…");
+  const r=await fetch(`${API}/score/${id}`,{method:"POST"});
+  if(r.ok){ toast("Scored! ✓"); loadDashboard(); }
+  else toast("Scoring failed",false);
+}
+
+async function loadCandidate(id){
+  const r=await fetch(`${API}/candidate/${id}`);
+  if(!r.ok){document.getElementById("candidate-detail").innerHTML="Not found";return;}
+  const c=await r.json();
+  const s=c.score_data;
+  const el=document.getElementById("candidate-detail");
+  if(!s){
+    el.innerHTML=`<div class="card"><h2>${c.name}</h2><p style="color:#aaa;margin-top:12px">Not scored yet.</p>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="runScore(${c.id})">⚡ Run AI Score</button></div>`;
+    return;
+  }
+  const dims=s.dimensions||{};
+  const maxMap={skills:25,motivation:25,leadership:30,growth:20};
+  el.innerHTML=`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div>
+          <h2>${c.name}</h2>
+          <p style="color:#aaa;font-size:13px;margin-top:4px">${c.age}y · ${c.city} · ${c.school} · GPA ${c.gpa}</p>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:40px;font-weight:800;color:#7c6ff7">${s.total_score}</div>
+          <div style="font-size:12px;color:#aaa">/ 100</div>
+        </div>
+      </div>
+      <p style="margin-top:12px;font-size:14px;color:#c4bdff">${s.recommendation}</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:14px;font-size:15px">Dimension Scores</h3>
+      ${Object.entries(dims).map(([k,v])=>`
+        <div class="dim-row">
+          <div class="dim-label">${k.charAt(0).toUpperCase()+k.slice(1)}</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${(v.score/maxMap[k])*100}%"></div></div>
+          <div class="score-num">${v.score}<span style="color:#555;font-size:11px">/${maxMap[k]}</span></div>
+        </div>
+        <p style="font-size:12px;color:#888;margin:-4px 0 10px 142px">${v.reason}</p>
+      `).join("")}
+    </div>
+
+    <div class="row2">
+      <div class="card">
+        <h3 style="margin-bottom:10px;font-size:14px">✅ Key Strengths</h3>
+        ${(s.key_strengths||[]).map(x=>`<span class="chip chip-green">${x}</span>`).join("")}
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:10px;font-size:14px">⚠️ Risks</h3>
+        ${(s.risks||[]).map(x=>`<span class="chip chip-red">${x}</span>`).join("")}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:10px;font-size:14px">AI Text Detection</h3>
+      <p>${aiBadge(s.ai_text_flag)} &nbsp;${s.ai_flag_reason||""}</p>
+    </div>
+
+    <div class="notice">⚠️ ${s.human_in_the_loop||"Human-in-the-loop: final decisions must be made by the admissions committee."}</div>
+
+    <div style="display:flex;gap:12px;margin-top:20px">
+      <button class="btn btn-success" onclick="setStatus(${c.id},'shortlisted')">✓ Shortlist</button>
+      <button class="btn btn-danger" onclick="setStatus(${c.id},'rejected')">✗ Reject</button>
+    </div>
+  `;
+}
+
+async function setStatus(id,status){
+  const r=await fetch(`${API}/candidate/${id}/status?status=${status}`,{method:"PATCH"});
+  if(r.ok) toast(`Status set: ${status}`);
+}
+</script>
+</body>
+</html>
