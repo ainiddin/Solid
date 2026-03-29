@@ -4,7 +4,7 @@
 
 ## 🌐 Демо
 
-- **Frontend:** https://ainiddin.github.io/Solid/frontend/#apply
+- **Frontend:** https://ainiddin.pythonanywhere.com
 - **Backend API:** https://ainiddin.pythonanywhere.com/candidates
 - **API Документация:** https://ainiddin.pythonanywhere.com/docs
 
