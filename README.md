@@ -1,68 +1,130 @@
-# inVision AI - Система скрининга кандидатов
+# inVision U — AI Candidate Screening System
 
-Проект представляет собой систему автоматизированного скрининга кандидатов с использованием искусственного интеллекта. Система оценивает кандидатов, анализирует их тексты на предмет использования ИИ (AI Detector) и работает с локальной базой данных SQLite. 
+Система автоматизированного скрининга кандидатов для программы inVision U (inDrive) с использованием искусственного интеллекта. Система оценивает кандидатов по 4 измерениям, объясняет каждый балл и определяет использование ИИ в эссе.
 
-## Технологический стек
+## 🌐 Демо
 
-* **Backend:** Python 3.11, FastAPI, Uvicorn, OpenAI API, SQLite (через `aiosqlite`), Pydantic.
-* **Frontend:** Чистый HTML/JS/CSS (раздаётся через встроенный Nginx).
-* **Инфраструктура:** Docker, Docker Compose.
-
-## Структура проекта
-
-* `backend/` - Исходный код API-сервера (FastAPI), логика оценки (`scorer.py`), детектор ИИ сгенерированных текстов (`ai_detector.py`) и маршруты (`routes/`).
-* `frontend/` - Веб-интерфейс приложения.
-* `docker-compose.yml` и `Dockerfile` - Конфигурации для удобного запуска контейнеров "из коробки".
+- **Frontend:** https://ainiddin.github.io/Solid/frontend/#apply
+- **Backend API:** https://ainiddin.pythonanywhere.com/candidates
+- **API Документация:** https://ainiddin.pythonanywhere.com/docs
 
 ---
 
-## 🚀 Как запустить проект локально с помощью Docker
+## 🧠 Как работает система
+Кандидат заполняет форму (Frontend)
+↓ POST /candidates
+Backend (FastAPI) сохраняет в SQLite
+↓ POST /score/{id}
+Groq API (LLaMA 3.3 70b) анализирует данные
+↓ Возвращает JSON с баллами + объяснениями
+Dashboard — комиссия видит результаты и принимает решение
 
-Это самый простой способ запустить проект — не нужно устанавливать Python, Nginx и скачивать библиотеки! От вас требуется **только** установленный [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+### Что оценивает система:
 
-### Шаг 1. Клонирование репозитория
-Скачайте проект на свой компьютер и перейдите в его папку:
+| Измерение | Вес | Что анализируется |
+|---|---|---|
+| Skills & Experience | 25% | Академический и технический бэкграунд |
+| Motivation & Values | 25% | Ясность цели и ценности |
+| Leadership Potential | 30% | Реальные лидерские сигналы |
+| Growth Trajectory | 20% | Траектория развития и mindset |
+
+### Explainable AI:
+Каждый балл сопровождается:
+- 📌 **Evidence** — прямая цитата из анкеты
+- 💬 **What would improve** — что подняло бы оценку
+- 🧠 **Overall reasoning** — общая логика решения
+- 🎤 **Interview questions** — вопросы для комиссии
+
+---
+
+## 🛠 Технологический стек
+
+- **Backend:** Python 3.11, FastAPI, Uvicorn
+- **AI:** Groq API (LLaMA 3.3 70b)
+- **AI Detector:** Определяет написано ли эссе человеком или ИИ
+- **Database:** SQLite через aiosqlite
+- **Frontend:** HTML / CSS / JavaScript (без фреймворков)
+- **Деплой:** PythonAnywhere (backend) + GitHub Pages (frontend)
+- **Контейнеризация:** Docker, Docker Compose
+
+---
+
+## 📁 Структура проекта
+invision-ai/
+├── backend/
+│ ├── main.py # FastAPI приложение + CORS
+│ ├── models.py # Pydantic схемы
+│ ├── scorer.py # Логика скоринга через Groq API
+│ ├── ai_detector.py # Детектор AI-текста в эссе
+│ ├── database.py # SQLite через aiosqlite
+│ └── routes/
+│ ├── candidates.py # POST/GET /candidates
+│ └── score.py # POST /score/{id}
+├── frontend/
+│ └── index.html # SPA: Apply / Dashboard / Candidate Card
+├── .env # API ключи (не публикуется)
+├── Dockerfile
+├── docker-compose.yml
+└── requirements.txt
+
+---
+
+## 🚀 Запуск локально через Docker
+
+Самый простой способ — нужен только [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+### Шаг 1 — Клонировать репозиторий
 ```bash
-git clone <ссылка_на_ваш_репозиторий>
-cd invision-ai
+git clone https://github.com/ainiddin/Solid.git
+cd Solid
 ```
 
-### Шаг 2. Настройка секретных ключей (.env)
-Поскольку система использует OpenAI API для анализа, ей нужен секретный ключ доступа:
-1. Запросите у владельца проекта файл `.env` (в нём хранятся секретные ключи, которые нельзя выкладывать в открытый доступ на GitHub).
-2. Положите файл `.env` прямо в корень папки проекта (на одном уровне с `docker-compose.yml`).
-*(Пример структуры: внутри файла должна быть строка формата `OPENAI_API_KEY=sk-...`)*
+### Шаг 2 — Создать .env файл
+Создай файл `.env` в корне проекта:
+OPENAI_API_KEY=gsk_твойgroqключ
+> Groq ключ получи бесплатно на **console.groq.com**
 
-### Шаг 3. Запуск всего приложения сразу
-Убедитесь, что Docker Desktop запущен (появился значок в панели задач или трее), а затем выполните команду в терминале:
-
+### Шаг 3 — Запустить
 ```bash
 docker-compose up -d --build
 ```
-*Флаг `-d` запускает проект в фоновом режиме, а `--build` собирает контейнеры заново, чтобы подтянуть последние изменения из кода.*
 
-### Шаг 4. Где искать запущенное приложение?
-Как только контейнеры запустятся, всё будет доступно локально на вашем компьютере:
-
-* 🖥️ **Веб-интерфейс (Frontend):** Откройте в браузере `http://localhost:80` (или просто `http://localhost`)
-* ⚙️ **API (Backend):** Работает параллельно на адресе `http://localhost:8000`
-* 📖 **Интерактивная документация:** Все доступные методы бэкенда можно потыкать и протестировать прямо в браузере по ссылке `http://localhost:8000/docs` (Swagger UI)
+### Шаг 4 — Открыть
+- 🖥️ **Сайт:** открой файл `frontend/index.html` в браузере
+- ⚙️ **API:** `http://localhost:8000`
+- 📖 **Swagger docs:** `http://localhost:8000/docs`
 
 ---
 
-## Прочие полезные команды Docker
+## 📡 API Endpoints
 
-**Остановить приложение (не удаляя данные):**
+| Метод | Путь | Описание |
+|---|---|---|
+| POST | `/candidates` | Добавить кандидата |
+| GET | `/candidates` | Список всех кандидатов |
+| GET | `/candidate/{id}` | Карточка кандидата |
+| POST | `/score/{id}` | Запустить AI-скоринг |
+| PATCH | `/candidate/{id}/status` | Shortlist / Reject |
+
+---
+
+## 🛑 Полезные команды
+
 ```bash
+# Остановить
 docker-compose stop
-```
 
-**Полностью выключить и удалить контейнеры приложения:**
-```bash
+# Выключить и удалить контейнеры
 docker-compose down
+
+# Посмотреть логи
+docker-compose logs -f
 ```
 
-**Посмотреть логи (ошибки, что сейчас происходит внутри бэкенда):**
-```bash
-docker-compose logs -f backend
-```
+---
+
+## ⚠️ Этические принципы
+
+- AI-оценка **advisory only** — финальное решение принимает комиссия (human-in-the-loop)
+- Демографические данные **не используются** как сигнал оценки
+- PII данные хранятся локально и не передаются третьим сторонам кроме Groq API
