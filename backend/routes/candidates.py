@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from typing import List
 import json
 from backend.models import CandidateIn
 from backend import database as db
@@ -9,6 +10,14 @@ router = APIRouter()
 async def create_candidate(body: CandidateIn):
     cid = await db.insert_candidate(body.model_dump())
     return {"id": cid, "message": "Candidate saved"}
+
+@router.post("/candidates/batch", status_code=201)
+async def create_candidates_batch(body: List[CandidateIn]):
+    ids = []
+    for candidate in body:
+        cid = await db.insert_candidate(candidate.model_dump())
+        ids.append(cid)
+    return {"ids": ids, "message": f"{len(ids)} candidates saved"}
 
 @router.get("/candidates")
 async def list_candidates():
@@ -21,6 +30,7 @@ async def list_candidates():
             entry["total_score"] = s.get("total_score")
             entry["recommendation"] = s.get("recommendation")
             entry["ai_text_flag"] = s.get("ai_text_flag")
+            entry["scoring_logic"] = s.get("scoring_logic")
         result.append(entry)
     return result
 
