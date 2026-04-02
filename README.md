@@ -1,36 +1,37 @@
-# inVision U — AI Candidate Screening System
+# inVision U — AI-система скрининга кандидатов
 
-Система автоматизированного скрининга кандидатов для программы inVision U (inDrive) с использованием искусственного интеллекта. Система оценивает кандидатов по 4 измерениям, объясняет каждый балл и определяет использование ИИ в эссе.
+AI-система автоматического отбора кандидатов для программы inVision U (inDrive).
+Оценивает кандидатов по 4 измерениям, объясняет каждый балл и определяет, написано ли эссе человеком или ИИ.
 
 ## 🌐 Демо
 
-- **Frontend:** https://ainiddin.pythonanywhere.com
-- **Backend API:** https://ainiddin.pythonanywhere.com/candidates
-- **API Документация:** https://ainiddin.pythonanywhere.com/docs
+- **Сайт:** [https://ainiddin.pythonanywhere.com](https://ainiddin.pythonanywhere.com)
+- **API:** [https://ainiddin.pythonanywhere.com/candidates](https://ainiddin.pythonanywhere.com/candidates)
+- **Документация:** [https://ainiddin.pythonanywhere.com/docs](https://ainiddin.pythonanywhere.com/docs)
 
 ---
 
 ## 🧠 Как работает система
-Кандидат заполняет форму (Frontend)
-↓ POST /candidates
-Backend (FastAPI) сохраняет в SQLite
-↓ POST /score/{id}
-Groq API (LLaMA 3.3 70b) анализирует данные
-↓ Возвращает JSON с баллами + объяснениями
-Dashboard — комиссия видит результаты и принимает решение
 
-### Что оценивает система:
+1. Кандидат заполняет форму заявки на сайте
+2. Backend сохраняет данные в SQLite через `POST /candidates`
+3. `POST /score/{id}` отправляет данные в Groq API (LLaMA 3.3 70b)
+4. ИИ возвращает баллы + объяснения + вопросы для интервью
+5. Комиссия видит результаты на Dashboard и принимает решение
+
+### Критерии оценки
 
 | Измерение | Вес | Что анализируется |
 |---|---|---|
 | Skills & Experience | 25% | Академический и технический бэкграунд |
-| Motivation & Values | 25% | Ясность цели и ценности |
+| Motivation & Values | 25% | Ясность цели и ценности кандидата |
 | Leadership Potential | 30% | Реальные лидерские сигналы |
-| Growth Trajectory | 20% | Траектория развития и mindset |
+| Growth Trajectory | 20% | Траектория роста и mindset |
 
-### Explainable AI:
+### Explainable AI — прозрачность оценки
+
 Каждый балл сопровождается:
-- 📌 **Evidence** — прямая цитата из анкеты
+- 📌 **Evidence** — прямая цитата из анкеты кандидата
 - 💬 **What would improve** — что подняло бы оценку
 - 🧠 **Overall reasoning** — общая логика решения
 - 🎤 **Interview questions** — вопросы для комиссии
@@ -41,10 +42,10 @@ Dashboard — комиссия видит результаты и принима
 
 - **Backend:** Python 3.11, FastAPI, Uvicorn
 - **AI:** Groq API (LLaMA 3.3 70b)
-- **AI Detector:** Определяет написано ли эссе человеком или ИИ
-- **Database:** SQLite через aiosqlite
-- **Frontend:** HTML / CSS / JavaScript (без фреймворков)
-- **Деплой:** PythonAnywhere (backend) + GitHub Pages (frontend)
+- **AI Детектор:** определяет, написано ли эссе человеком или ИИ
+- **База данных:** SQLite через aiosqlite
+- **Frontend:** Vanilla HTML / CSS / JavaScript (без фреймворков)
+- **Деплой:** PythonAnywhere
 - **Контейнеризация:** Docker, Docker Compose
 
 ---
@@ -55,13 +56,13 @@ invision-ai/
 │ ├── main.py # FastAPI приложение + CORS
 │ ├── models.py # Pydantic схемы
 │ ├── scorer.py # Логика скоринга через Groq API
-│ ├── ai_detector.py # Детектор AI-текста в эссе
+│ ├── ai_detector.py # Детектор AI-текста
 │ ├── database.py # SQLite через aiosqlite
 │ └── routes/
 │ ├── candidates.py # POST/GET /candidates
 │ └── score.py # POST /score/{id}
 ├── frontend/
-│ └── index.html # SPA: Apply / Dashboard / Candidate Card
+│ └── index.html # SPA: Apply / Dashboard / Карточка кандидата
 ├── .env # API ключи (не публикуется)
 ├── Dockerfile
 ├── docker-compose.yml
@@ -71,18 +72,14 @@ invision-ai/
 
 ## 🚀 Запуск локально через Docker
 
-Самый простой способ — нужен только [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-
 ### Шаг 1 — Клонировать репозиторий
 ```bash
 git clone https://github.com/ainiddin/Solid.git
 cd Solid
 ```
-
-### Шаг 2 — Создать .env файл
-Создай файл `.env` в корне проекта:
 OPENAI_API_KEY=gsk_твойgroqключ
-> Groq ключ получи бесплатно на **console.groq.com**
+
+> Groq ключ — бесплатно на **console.groq.com**
 
 ### Шаг 3 — Запустить
 ```bash
@@ -90,9 +87,9 @@ docker-compose up -d --build
 ```
 
 ### Шаг 4 — Открыть
-- 🖥️ **Сайт:** открой файл `frontend/index.html` в браузере
+- 🖥️ **Сайт:** открой `frontend/index.html` в браузере
 - ⚙️ **API:** `http://localhost:8000`
-- 📖 **Swagger docs:** `http://localhost:8000/docs`
+- 📖 **Docs:** `http://localhost:8000/docs`
 
 ---
 
@@ -111,20 +108,18 @@ docker-compose up -d --build
 ## 🛑 Полезные команды
 
 ```bash
-# Остановить
-docker-compose stop
-
-# Выключить и удалить контейнеры
-docker-compose down
-
-# Посмотреть логи
-docker-compose logs -f
+docker-compose stop       # Остановить
+docker-compose down       # Остановить и удалить контейнеры
+docker-compose logs -f    # Посмотреть логи
 ```
 
 ---
 
 ## ⚠️ Этические принципы
 
-- AI-оценка **advisory only** — финальное решение принимает комиссия (human-in-the-loop)
+- AI-оценка **носит рекомендательный характер** — финальное решение принимает комиссия
 - Демографические данные **не используются** как сигнал оценки
-- PII данные хранятся локально и не передаются третьим сторонам кроме Groq API
+- Личные данные хранятся локально и не передаются третьим сторонам, кроме Groq API
+
+### Шаг 2 — Создать .env файл
+OPENAI_API_KEY=gsk_твойgroqключOPENAI_API_KEY=gsk_твойgroqключOPENAI_API_KEY=gsk_твойgroqключ
