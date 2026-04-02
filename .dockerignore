@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 __pycache__/
 *.pyc
 .env
 .git/
+=======
+__pycache__/
+*.pyc
+.env
+.git/
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
 candidates.db

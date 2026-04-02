@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 fastapi
 uvicorn
 openai
 python-dotenv
 aiosqlite
+=======
+fastapi
+uvicorn
+openai
+python-dotenv
+aiosqlite
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
 pydantic

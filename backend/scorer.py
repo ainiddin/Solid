@@ -2,6 +2,10 @@ import os
 import json
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
+<<<<<<< HEAD
+=======
+
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
 load_dotenv()
 
 client = AsyncOpenAI(
@@ -9,6 +13,7 @@ client = AsyncOpenAI(
     base_url="https://api.groq.com/openai/v1"
 )
 
+<<<<<<< HEAD
 SYSTEM_PROMPT = """You are a candidate screening AI for inVision U — inDrive's university for future innovators and leaders in Central Asia.
 
 All candidates are HIGH SCHOOL GRADUATES (17-18 years old). Do NOT penalize for lack of work experience — evaluate them on potential, drive, and academic/extracurricular achievements.
@@ -20,35 +25,61 @@ Admission requirements:
 - Extracurricular achievements, certificates, olympiads
 
 Score the candidate and explain EVERY score in detail so the admissions committee understands exactly why.
+=======
+SYSTEM_PROMPT = """You are a candidate screening AI for inVision U (inDrive).
+
+Score the candidate and explain EVERY score in detail so the admissions committee understands exactly why.
+
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
 Return ONLY valid JSON:
 {
   "total_score": <0-100>,
   "dimensions": {
+<<<<<<< HEAD
     "academic": {
       "score": <0-30>,
       "reason": "2-3 sentences: evaluate ҰБТ score, IELTS/TOEFL, olympiad diplomas, academic achievements",
+=======
+    "skills": {
+      "score": <0-25>,
+      "reason": "2-3 sentences explaining the score",
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
       "evidence": "exact quote or fact from candidate data that drove this score",
       "what_would_improve": "what would have made this score higher"
     },
     "motivation": {
       "score": <0-25>,
+<<<<<<< HEAD
       "reason": "2-3 sentences: evaluate clarity of goals, passion, why inVision U specifically",
+=======
+      "reason": "2-3 sentences explaining the score",
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
       "evidence": "exact quote or fact from candidate data that drove this score",
       "what_would_improve": "what would have made this score higher"
     },
     "leadership": {
+<<<<<<< HEAD
       "score": <0-25>,
       "reason": "2-3 sentences: evaluate leadership potential for a school graduate — clubs, initiatives, projects, competitions organized",
+=======
+      "score": <0-30>,
+      "reason": "2-3 sentences explaining the score",
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
       "evidence": "exact quote or fact from candidate data that drove this score",
       "what_would_improve": "what would have made this score higher"
     },
     "growth": {
       "score": <0-20>,
+<<<<<<< HEAD
       "reason": "2-3 sentences: evaluate learning mindset, curiosity, self-development beyond school curriculum",
+=======
+      "reason": "2-3 sentences explaining the score",
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
       "evidence": "exact quote or fact from candidate data that drove this score",
       "what_would_improve": "what would have made this score higher"
     }
   },
+<<<<<<< HEAD
   "requirements_check": {
     "ubt_score": <number or null>,
     "ubt_pass": <true|false>,
@@ -58,10 +89,14 @@ Return ONLY valid JSON:
     "disqualify_reason": "<reason if disqualified, else null>"
   },
   "scoring_logic": "3-4 sentences summarizing the overall scoring decision, mentioning ҰБТ and IELTS results explicitly",
+=======
+  "scoring_logic": "3-4 sentences summarizing the overall scoring decision and how dimensions relate to each other",
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
   "ai_text_flag": "<Low|Medium|High>",
   "recommendation": "<Strong candidate — shortlist | Promising — review | Needs more context | Not recommended>",
   "key_strengths": ["specific strength with evidence", "specific strength with evidence"],
   "risks": ["specific risk with explanation"],
+<<<<<<< HEAD
   "committee_notes": "2-3 actionable interview questions tailored to THIS candidate's profile"
 }
 
@@ -73,6 +108,15 @@ RULES:
 - Do NOT base any score on demographics, name, ethnicity, or socioeconomic status
 - Be honest — if data is weak, say so clearly in reason fields"""
 
+=======
+  "committee_notes": "2-3 actionable questions the committee should ask this candidate in interview"
+}
+
+RULES:
+- evidence must be a direct reference to something the candidate actually wrote or provided
+- Do NOT base any score on demographics, race, or socioeconomic status
+- Be honest — if data is weak, say so clearly"""
+>>>>>>> 74f7674ba2fbf83ea646c78da1fc74bac6f7205d
 
 async def score_candidate(candidate: dict) -> dict:
     user_prompt = f"Candidate data:\n{json.dumps(candidate, ensure_ascii=False, indent=2)}"
