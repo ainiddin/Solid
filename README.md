@@ -5,9 +5,17 @@ AI-система автоматического отбора кандидато
 
 ## 🌐 Демо
 
-- **Сайт:** [https://ainiddin.pythonanywhere.com](https://ainiddin.pythonanywhere.com)
+- **Форма заявки:** [https://ainiddin.pythonanywhere.com](https://ainiddin.pythonanywhere.com)
+- **Админка:** [https://ainiddin.pythonanywhere.com/admin](https://ainiddin.pythonanywhere.com/admin)
 - **API:** [https://ainiddin.pythonanywhere.com/candidates](https://ainiddin.pythonanywhere.com/candidates)
 - **Документация:** [https://ainiddin.pythonanywhere.com/docs](https://ainiddin.pythonanywhere.com/docs)
+
+---
+
+## 🔐 Доступ в админку
+
+- **Логин:** `admin`
+- **Пароль:** `invision2025`
 
 ---
 
@@ -17,7 +25,7 @@ AI-система автоматического отбора кандидато
 2. Backend сохраняет данные в SQLite через `POST /candidates`
 3. `POST /score/{id}` отправляет данные в Groq API (LLaMA 3.3 70b)
 4. ИИ возвращает баллы + объяснения + вопросы для интервью
-5. Комиссия видит результаты на Dashboard и принимает решение
+5. Комиссия заходит в админку и видит все результаты
 
 ### Критерии оценки
 
@@ -50,7 +58,6 @@ AI-система автоматического отбора кандидато
 
 ---
 
-## 📁 Структура проекта
 invision-ai/
 ├── backend/
 │ ├── main.py # FastAPI приложение + CORS
@@ -62,11 +69,14 @@ invision-ai/
 │ ├── candidates.py # POST/GET /candidates
 │ └── score.py # POST /score/{id}
 ├── frontend/
-│ └── index.html # SPA: Apply / Dashboard / Карточка кандидата
+│ ├── index.html # Форма заявки для кандидатов
+│ ├── admin.html # Админка — Dashboard комиссии
+│ └── candidate.html # Карточка кандидата
 ├── .env # API ключи (не публикуется)
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
+
 
 ---
 
@@ -77,6 +87,9 @@ invision-ai/
 git clone https://github.com/ainiddin/Solid.git
 cd Solid
 ```
+
+### Шаг 2 — Создать .env файл
+
 OPENAI_API_KEY=gsk_твойgroqключ
 
 > Groq ключ — бесплатно на **console.groq.com**
@@ -87,7 +100,8 @@ docker-compose up -d --build
 ```
 
 ### Шаг 4 — Открыть
-- 🖥️ **Сайт:** открой `frontend/index.html` в браузере
+- 🖥️ **Форма:** открой `frontend/index.html` в браузере
+- 🔐 **Админка:** открой `frontend/admin.html` в браузере
 - ⚙️ **API:** `http://localhost:8000`
 - 📖 **Docs:** `http://localhost:8000/docs`
 
@@ -121,5 +135,4 @@ docker-compose logs -f    # Посмотреть логи
 - Демографические данные **не используются** как сигнал оценки
 - Личные данные хранятся локально и не передаются третьим сторонам, кроме Groq API
 
-### Шаг 2 — Создать .env файл
-OPENAI_API_KEY=gsk_твойgroqключOPENAI_API_KEY=gsk_твойgroqключOPENAI_API_KEY=gsk_твойgroqключ
+## 📁 Структура проекта
